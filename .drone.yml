@@ -9,7 +9,7 @@ steps:
     environment:
       GOPROXY: https://athens.chuhlomin.com
     commands:
-      - apk add --no-cache make protobuf
+      - apk add --no-cache make gcc protobuf
       - make test
       - make install
     when:
