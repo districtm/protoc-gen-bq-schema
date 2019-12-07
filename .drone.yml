@@ -5,11 +5,12 @@ name: default
 
 steps:
   - name: build
-    image: golang:1.12
+    image: golang:1.12.14-alpine3.10
     environment:
       GOPROXY: https://athens.chuhlomin.com
     commands:
       - make test
+      - apk add --no-cache protobuf
       - make install
     when:
       event: push
