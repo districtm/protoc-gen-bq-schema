@@ -18,12 +18,13 @@ steps:
   - name: cr
     image: plugins/docker
     settings:
+      repo: chuhlomin/protoc-gen-bq-schema
       username: chuhlomin
       password:
         from_secret: docker_password
       tags:
-        - latest
         - ${DRONE_COMMIT:0:7}
+        - latest
     when:
       event: push
       branch: develop
