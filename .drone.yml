@@ -9,25 +9,24 @@ steps:
     environment:
       GOPROXY: https://athens.chuhlomin.com
     commands:
-      - apk add --no-cache make gcc protobuf
+      - apk add --no-cache make git gcc libc-dev protobuf
       - make test
       - make install
     when:
       event: push
 
-  # ToDo: Uncomment if build step is working
-  # - name: cr
-  #   image: plugins/docker
-  #   settings:
-  #     username: chuhlomin
-  #     password:
-  #       from_secret: docker_password
-  #     tags:
-  #       - ${DRONE_COMMIT}
-  #       - latest
-  #   when:
-  #     event: push
-  #     branch: develop
+  - name: cr
+    image: plugins/docker
+    settings:
+      username: chuhlomin
+      password:
+        from_secret: docker_password
+      tags:
+        - ${DRONE_COMMIT}
+        - latest
+    when:
+      event: push
+      branch: develop
 
 trigger:
   branch:
