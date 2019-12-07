@@ -15,11 +15,11 @@ steps:
         - latest
     when:
       event: push
-      branch: master
+      branch: develop
 
 trigger:
   branch:
-    - master
+    - develop
 
 image_pull_secrets:
   - dockerconfigjson
