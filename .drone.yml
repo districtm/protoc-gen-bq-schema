@@ -12,10 +12,8 @@ steps:
       - apk add --no-cache make git gcc libc-dev protobuf
       - make test
       - make install
-    when:
-      event: push
 
-  - name: cr
+  - name: cr-latest
     image: plugins/docker
     settings:
       repo: chuhlomin/protoc-gen-bq-schema
@@ -28,6 +26,19 @@ steps:
     when:
       event: push
       branch: develop
+
+  - name: cr-release
+    image: plugins/docker
+    settings:
+      repo: chuhlomin/protoc-gen-bq-schema
+      username: chuhlomin
+      password:
+        from_secret: docker_password
+      tags:
+        - ${DRONE_TAG}
+        - latest
+    when:
+      event: tag
 
 trigger:
   branch:
