@@ -4,18 +4,29 @@ type: docker
 name: default
 
 steps:
-  - name: cr
-    image: plugins/docker
-    settings:
-      username: chuhlomin
-      password:
-        from_secret: docker_password
-      tags:
-        - ${DRONE_COMMIT}
-        - latest
+  - name: build
+    image: golang:1.12
+    environment:
+      GOPROXY: https://athens.chuhlomin.com
+    commands:
+      - make test
+      - make install
     when:
       event: push
-      branch: develop
+
+  # ToDo: Uncomment if build step is working
+  # - name: cr
+  #   image: plugins/docker
+  #   settings:
+  #     username: chuhlomin
+  #     password:
+  #       from_secret: docker_password
+  #     tags:
+  #       - ${DRONE_COMMIT}
+  #       - latest
+  #   when:
+  #     event: push
+  #     branch: develop
 
 trigger:
   branch:
