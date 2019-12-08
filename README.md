@@ -51,16 +51,23 @@ syntax = "proto3";
 package foo;
 
 import "google/type/date.proto";
-import "bq_table.proto";
-import "bq_field.proto";
+import "bq/bq_table.proto";
+import "bq/bq_field.proto";
 
 message Bar {
   option (gen_bq_schema.bigquery_opts).table_name = "bar_table";
   option (gen_bq_schema.bigquery_opts).extra_fields = "f:INTEGER";
-  option (gen_bq_schema.bigquery_opts).extra_fields = "g:RECORD:Nested";
+  option (gen_bq_schema.bigquery_opts).extra_fields = "g:RECORD:Baz";
 
   message Nested {
     repeated int32 a = 1;
+  }
+
+  enum EnumAllowingAlias {
+    option allow_alias = true;
+    UNKNOWN = 0;
+    STARTED = 1;
+    RUNNING = 1;
   }
 
   int32 a = 1; // field comment
@@ -76,6 +83,8 @@ message Bar {
   ];
 
   google.type.Date date = 6 [(gen_bq_schema.bigquery).type_override = "DATE"];
+
+  EnumAllowingAlias status = 8;
 }
 
 message Baz {
