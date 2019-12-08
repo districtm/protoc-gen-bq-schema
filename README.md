@@ -82,9 +82,11 @@ message Baz {
 
 The message `foo.Baz` is ignored because it doesn't have option `gen_bq_schema.bigquery_opts`.
 
+Plugin parameter `enumsasints=true` will marshal all enums into integers instead of strings: `protoc --bq-schema_out=enumsasints=true:. foo.proto`.
+
 ## Docker Hub
 
-You can use [chuhlomin/protoc-gen-bq-schema image](https://hub.docker.com/repository/docker/chuhlomin/protoc-gen-bq-schema) on Doker Hub.
+You can use [chuhlomin/protoc-gen-bq-schema image](https://hub.docker.com/repository/docker/chuhlomin/protoc-gen-bq-schema) on Docker Hub.
 
 Example [Docker](https://www.docker.com) run:
 
@@ -106,6 +108,32 @@ Example [Drone](https://drone.io) step: [`.drone.yml`](https://github.com/chuhlo
     commands:
       - mkdir bq_schema
       - protoc -I/protobuf/ -I. -Ibq --bq-schema_out=bq_schema foo.proto
+```
+
+## Local Development
+
+To test and build the plugin binary on your machine run the following commands:
+
+```bash
+make clean
+make test
+make install
+
+# optionally to build a Docker image
+docker build -t protoc-gen-bq-schema:local .
+```
+
+To build binaries inside an isolated Docker container:
+
+```bash
+docker run -i -t -v $(pwd):/workdir golang:1.12.14-alpine3.10 /bin/sh
+
+apk add --no-cache make git gcc libc-dev protobuf
+make clean
+make test
+make install
+
+exit
 ```
 
 ## License
