@@ -2,11 +2,16 @@
 
 [![Build Status](https://ci.chuhlomin.com/api/badges/chuhlomin/protoc-gen-bq-schema/status.svg)](https://ci.chuhlomin.com/chuhlomin/protoc-gen-bq-schema) [![Docker Hub](https://img.shields.io/badge/duckerhub-1.5-lightgrey)](https://hub.docker.com/repository/docker/chuhlomin/protoc-gen-bq-schema)
 
-> This is the fork of [GoogleCloudPlatform/protoc-gen-bq-schema](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema) repository with merged PRs:
+> This is the fork of [GoogleCloudPlatform/protoc-gen-bq-schema](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema) repository addressing these PRs:
 > * #12 [Use comments as field description](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/12) (from [`master`](https://github.com/chuhlomin/protoc-gen-bq-schema/tree/master) branch in this repository)
 > * #14 [Add support for message-level extra_fields](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/14)
+> * #3 [Enums as Integers plugin parameter](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/3) – since v1.5
 > 
 > Default branch of this repository is [`develop`](https://github.com/chuhlomin/protoc-gen-bq-schema/tree/develop).
+> 
+> Two satellite repositories:
+> * [protoc-gen-bq-schema-example-proto](https://github.com/chuhlomin/protoc-gen-bq-schema-example-proto) – example of input Protobuf files
+> * [protoc-gen-bq-schema-example-bq](https://github.com/chuhlomin/protoc-gen-bq-schema-example-bq) – example of generated Big Schema JSON files
 
 protoc-gen-bq-schema is a plugin for [ProtocolBuffer compiler](https://github.com/google/protobuf).
 
@@ -93,7 +98,7 @@ Example [Docker](https://www.docker.com) run:
 ```bash
 mkdir bq_schema
 docker run -i -t -v $(pwd):/workdir \
-  chuhlomin/protoc-gen-bq-schema:1.4 \
+  chuhlomin/protoc-gen-bq-schema:1.5 \
   -I/workdir \
   -I/workdir/bq \
   --bq-schema_out=/workdir/bq_schema \
@@ -104,7 +109,7 @@ Example [Drone](https://drone.io) step: [`.drone.yml`](https://github.com/chuhlo
 
 ```
   - name: build
-    image: chuhlomin/protoc-gen-bq-schema:1.4
+    image: chuhlomin/protoc-gen-bq-schema:1.5
     commands:
       - mkdir bq_schema
       - protoc -I/protobuf/ -I. -Ibq --bq-schema_out=bq_schema foo.proto
