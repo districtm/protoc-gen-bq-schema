@@ -1,6 +1,6 @@
 # protoc-gen-bq-schema
 
-[![Build Status](https://ci.chuhlomin.com/api/badges/chuhlomin/protoc-gen-bq-schema/status.svg)](https://ci.chuhlomin.com/chuhlomin/protoc-gen-bq-schema)
+[![Build Status](https://ci.chuhlomin.com/api/badges/chuhlomin/protoc-gen-bq-schema/status.svg)](https://ci.chuhlomin.com/chuhlomin/protoc-gen-bq-schema) [![Docker Hub](https://img.shields.io/badge/duckerhub-1.5-lightgrey)](https://hub.docker.com/repository/docker/chuhlomin/protoc-gen-bq-schema)
 
 > This is the fork of [GoogleCloudPlatform/protoc-gen-bq-schema](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema) repository with merged PRs:
 > * #12 [Use comments as field description](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/12) (from [`master`](https://github.com/chuhlomin/protoc-gen-bq-schema/tree/master) branch in this repository)
