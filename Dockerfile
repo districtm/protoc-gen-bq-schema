@@ -9,7 +9,7 @@ RUN apk add --no-cache protobuf curl && \
         curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
         done && \
         for f in calendar_period color date datetime dayofweek expr fraction latlng money month postal_address quaternion timeofday type; do \
-        curl -L -o /protobuf/google/type/${f}.proto https://raw.githubusercontent.com/googleapis/googleapis/master/src/google/type/${f}.proto; \
+        curl -L -o /protobuf/google/type/${f}.proto https://raw.githubusercontent.com/googleapis/googleapis/master/google/type/${f}.proto; \
         done && \
         apk del curl
 
