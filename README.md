@@ -42,7 +42,10 @@ Suppose that we have the following [`foo.proto`](https://github.com/chuhlomin/pr
 
 ```protobuf
 syntax = "proto3";
+
 package foo;
+
+import "google/type/date.proto";
 import "bq_table.proto";
 import "bq_field.proto";
 
@@ -66,6 +69,8 @@ message Bar {
       type_override: 'TIMESTAMP'
     }
   ];
+
+  google.type.Date date = 6 [(gen_bq_schema.bigquery).type_override = "DATE"];
 }
 
 message Baz {
@@ -84,8 +89,9 @@ You can use [chuhlomin/protoc-gen-bq-schema image](https://hub.docker.com/reposi
 Example [Docker](https://www.docker.com) run:
 
 ```bash
+mkdir bq_schema
 docker run -i -t -v $(pwd):/workdir \
-  chuhlomin/protoc-gen-bq-schema:1.2 \
+  chuhlomin/protoc-gen-bq-schema:1.4 \
   -I/workdir \
   -I/workdir/bq \
   --bq-schema_out=/workdir/bq_schema \
@@ -96,7 +102,7 @@ Example [Drone](https://drone.io) step: [`.drone.yml`](https://github.com/chuhlo
 
 ```
   - name: build
-    image: chuhlomin/protoc-gen-bq-schema:1.2
+    image: chuhlomin/protoc-gen-bq-schema:1.4
     commands:
       - mkdir bq_schema
       - protoc -I/protobuf/ -I. -Ibq --bq-schema_out=bq_schema foo.proto
