@@ -28,7 +28,7 @@ go get github.com/chuhlomin/protoc-gen-bq-schema
 ## Usage
 
 ```
-protoc --bq-schema\_out=path/to/outdir foo.proto
+protoc --bq-schema_out=path/to/outdir foo.proto
 ```
 
 `protoc` and `protoc-gen-bq-schema` commands must be found in $PATH.
