@@ -5,7 +5,7 @@
 > This is the fork of [GoogleCloudPlatform/protoc-gen-bq-schema](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema) repository addressing these PRs:
 > * #12 [Use comments as field description](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/12) (from [`master`](https://github.com/chuhlomin/protoc-gen-bq-schema/tree/master) branch in this repository)
 > * #14 [Add support for message-level extra_fields](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/14)
-> * #3 [Enums as Integers plugin parameter](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/3) – since v1.5
+> * #17 [Added enumsasints plugin parameter](https://github.com/GoogleCloudPlatform/protoc-gen-bq-schema/pull/17) – since v1.5
 > 
 > Default branch of this repository is [`develop`](https://github.com/chuhlomin/protoc-gen-bq-schema/tree/develop).
 > 

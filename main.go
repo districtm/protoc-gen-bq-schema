@@ -45,10 +45,6 @@ var (
 		children: make(map[string]*ProtoPackage),
 		types:    make(map[string]*descriptor.DescriptorProto),
 	}
-
-	enumsAsInts = false // marshal enums into integers instead of strings
-	// can be changed by passing `enumsasints=true` plugin parameter
-	// like this: protoc ... --bq-schema_out=enumsasints=true:/outdir ...
 )
 
 // Field describes the schema of a field in BigQuery.
