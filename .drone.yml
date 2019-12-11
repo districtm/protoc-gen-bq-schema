@@ -42,6 +42,3 @@ steps:
 trigger:
   branch:
     - develop
-
-image_pull_secrets:
-  - dockerconfigjson
