@@ -43,7 +43,7 @@ protoc --bq-schema_out=path/to/out/dir foo.proto --proto_path=. --proto_path=<pa
 ```
 
 ### Example
-Suppose that we have the following [`foo.proto`](https://github.com/chuhlomin/protoc-gen-bq-schema-example-proto/blob/master/foo.proto).
+Suppose that we have the following [`foo.proto`](https://github.com/chuhlomin/protoc-gen-bq-schema-example-proto/blob/master/foo/foo.proto).
 
 ```protobuf
 syntax = "proto3";
