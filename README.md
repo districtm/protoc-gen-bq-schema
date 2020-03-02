@@ -22,7 +22,7 @@ So you can reuse existing data definitions in `.proto` for BigQuery with this pl
 ## Installation
 
 ```
-go get github.com/chuhlomin/protoc-gen-bq-schema
+go get github.com/jeremiepiotte-districtm/protoc-gen-bq-schema
 ```
 
 ## Usage
