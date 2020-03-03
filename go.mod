@@ -1,4 +1,4 @@
-module github.com/chuhlomin/protoc-gen-bq-schema
+module github.com/jeremiepiotte-districtm/protoc-gen-bq-schema
 
 go 1.12
 
