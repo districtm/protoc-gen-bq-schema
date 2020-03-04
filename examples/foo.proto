@@ -1,5 +1,7 @@
 syntax = "proto2";
 package foo;
+option go_package = "github.com/jeremiepiotte-districtm/protoc-gen-bq-schema/new_folder";
+
 import "bq_table.proto";
 import "bq_field.proto";
 

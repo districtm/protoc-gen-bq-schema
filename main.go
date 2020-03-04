@@ -30,7 +30,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/chuhlomin/protoc-gen-bq-schema/protos"
+	"github.com/jeremiepiotte-districtm/protoc-gen-bq-schema/protos"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
@@ -155,8 +155,14 @@ func (pkg *ProtoPackage) relativelyLookupType(name string) (*descriptor.Descript
 	}
 }
 
-func (pkg *ProtoPackage) relativelyLookupPackage(name string) (*ProtoPackage, bool) {
-	components := strings.Split(name, ".")
+func (pkg *ProtoPackage) relativelyLookupPackage(name string, is_go_package bool) (*ProtoPackage, bool) {
+	separator := "."
+	if is_go_package {
+		separator = "/"
+	}
+
+	components := strings.Split(name, separator)
+
 	for _, c := range components {
 		var ok bool
 		pkg, ok = pkg.children[c]
@@ -397,9 +403,17 @@ var e_TableName = &proto.ExtensionDesc{
 
 func convertFile(file *descriptor.FileDescriptorProto) ([]*plugin.CodeGeneratorResponse_File, error) {
 	name := path.Base(file.GetName())
-	pkg, ok := globalPkg.relativelyLookupPackage(file.GetPackage())
+	pkg_ := ""
+	is_go_pkg := false
+	if len(file.GetOptions().GetGoPackage()) > 0 {
+		pkg_ = file.GetOptions().GetGoPackage()
+		is_go_pkg = true
+	} else {
+		pkg_ = file.GetPackage()
+	}
+	pkg, ok := globalPkg.relativelyLookupPackage(pkg_, is_go_pkg)
 	if !ok {
-		return nil, fmt.Errorf("no such package found: %s", file.GetPackage())
+		return nil, fmt.Errorf("no such package found: %s", pkg_)
 	}
 
 	comments := ParseComments(file)
