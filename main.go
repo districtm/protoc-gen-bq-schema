@@ -24,13 +24,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/districtm/protoc-gen-bq-schema/protos"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/GoogleCloudPlatform/protoc-gen-bq-schema/protos"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"

@@ -6,7 +6,7 @@ It converts messages written in .proto format into schema files in JSON for BigQ
 So you can reuse existing data definitions in .proto for BigQuery with this plugin.
 
 ## Installation
- go get github.com/GoogleCloudPlatform/protoc-gen-bq-schema
+ go get github.com/districtm/protoc-gen-bq-schema
 
 ## Usage
  protoc --bq-schema\_out=path/to/outdir foo.proto
