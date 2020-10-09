@@ -501,12 +501,6 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 func convertFrom(rd io.Reader) (*plugin.CodeGeneratorResponse, error) {
 	glog.V(1).Info("Reading code generation request")
 	input, err := ioutil.ReadAll(rd)
-	//f, err := os.Create("/Users/jeremiepiotte/sandbox/proto_gen_input_test.txt")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//_, _ = f.Write(input)
-	//f.Close()
 	if err != nil {
 		glog.Error("Failed to read request:", err)
 		return nil, err
