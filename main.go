@@ -467,7 +467,6 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 				nodeIdx = 0
 				break
 			}
-
 			nodeIdx += 1
 		}
 
