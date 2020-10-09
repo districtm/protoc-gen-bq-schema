@@ -432,49 +432,7 @@ func convert(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, e
 	for _, file := range req.GetProtoFile() {
 		for _, msg := range file.GetMessageType() {
 
-			for _, ext := range extensions {
-				extendeeNodes := strings.Split(ext.GetExtendee(), ".")
-				pkgNodes := strings.Split(file.GetPackage(), ".")
-
-				// We already know this extendee cannot be in this package.
-				if len(pkgNodes) > len(extendeeNodes) {
-					continue
-				}
-
-				// skipping leading "."
-				nodeIdx := 1
-				for _, node := range pkgNodes {
-					if node != extendeeNodes[nodeIdx] {
-						nodeIdx = 0
-						break
-					}
-
-					nodeIdx += 1
-				}
-
-				// Not the right package or message
-				if nodeIdx == 0 || msg.GetName() != extendeeNodes[nodeIdx] {
-					continue
-				}
-
-				foundNode := (*descriptor.DescriptorProto)(nil)
-				nestedMsgs := msg.GetNestedType()
-				for i := nodeIdx; i < len(extendeeNodes); i += 1 {
-					foundNode = nil
-					for _, nestedMsg := range nestedMsgs {
-						if nestedMsg.GetName() == extendeeNodes[i] {
-							foundNode = nestedMsg
-							break
-						}
-					}
-				}
-
-				if foundNode != nil {
-					foundNode.Extension = append(foundNode.Extension, ext)
-				} else {
-					msg.Extension = append(msg.Extension, ext)
-				}
-			}
+			addExtensions(msg, extensions, file.GetPackage())
 
 			glog.V(1).Infof("Loading a message type %s from package %s", msg.GetName(), file.GetPackage())
 			registerType(file.Package, msg)
@@ -492,6 +450,52 @@ func convert(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, e
 		}
 	}
 	return res, nil
+}
+
+func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.FieldDescriptorProto, pkg string) {
+	for _, ext := range extensions {
+		extendeeNodes := strings.Split(ext.GetExtendee(), ".")
+		pkgNodes := strings.Split(pkg, ".")
+
+		// We already know this extendee cannot be in this package.
+		if len(pkgNodes) > len(extendeeNodes) {
+			continue
+		}
+
+		// skipping leading "."
+		nodeIdx := 1
+		for _, node := range pkgNodes {
+			if node != extendeeNodes[nodeIdx] {
+				nodeIdx = 0
+				break
+			}
+
+			nodeIdx += 1
+		}
+
+		// Not the right package or message
+		if nodeIdx == 0 || msg.GetName() != extendeeNodes[nodeIdx] {
+			continue
+		}
+
+		foundNode := (*descriptor.DescriptorProto)(nil)
+		nestedMsgs := msg.GetNestedType()
+		for i := nodeIdx; i < len(extendeeNodes); i += 1 {
+			foundNode = nil
+			for _, nestedMsg := range nestedMsgs {
+				if nestedMsg.GetName() == extendeeNodes[i] {
+					foundNode = nestedMsg
+					break
+				}
+			}
+		}
+
+		if foundNode != nil {
+			foundNode.Extension = append(foundNode.Extension, ext)
+		} else {
+			msg.Extension = append(msg.Extension, ext)
+		}
+	}
 }
 
 func convertFrom(rd io.Reader) (*plugin.CodeGeneratorResponse, error) {
