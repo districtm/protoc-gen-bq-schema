@@ -110,6 +110,123 @@ func TestSimple(t *testing.T) {
 		})
 }
 
+// Checks if the generator can handle basic extensions living in the same package and file
+func TestMessageWithExtension(t *testing.T) {
+	testConvert(t, `
+			file_to_generate: "foo.proto"			
+			proto_file: <
+				name: "foo.proto"
+				package: "example_package.nested.a.lot"
+				message_type: <
+					name: "Foo"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_STRING json_name: "b" >
+					extension_range: < start: 100 end: 200 >
+					options < [gen_bq_schema.bigquery_opts] <table_name: "foo_table"> >
+				>
+				extension: <
+					name: "bar"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package.nested.a.lot.Foo"
+					json_name: "bar"
+				>
+			>
+		`,
+		map[string]string{
+			"example_package/nested/a/lot/foo_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "ext", "type": "RECORD", "mode": "NULLABLE",
+				  	"fields": [{ "name": "bar", "type": "INTEGER", "mode": "NULLABLE" } ]
+				 }
+				]`,
+		})
+}
+
+// Checks if the generator can handle basic extensions living in a different file
+func TestMessageWithExtensionInDifferentFile(t *testing.T) {
+	testConvert(t, `
+			file_to_generate: "foo.proto"			
+			proto_file: <
+				name: "foo.proto"
+				package: "example_package.nested.a.lot"
+				message_type: <
+					name: "Foo"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_STRING json_name: "b" >
+					extension_range: < start: 100 end: 200 >
+					options < [gen_bq_schema.bigquery_opts] <table_name: "foo_table"> >
+				>
+			>
+			proto_file: <
+				name: "bar.proto"
+				package: "example_package.nested.a.lot"
+				extension: <
+						name: "bar"
+						number: 126
+						label: LABEL_OPTIONAL
+						type: TYPE_INT32
+						extendee: ".example_package.nested.a.lot.Foo"
+						json_name: "bar"
+					>
+			>
+		`,
+		map[string]string{
+			"example_package/nested/a/lot/foo_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "ext", "type": "RECORD", "mode": "NULLABLE",
+				  	"fields": [{ "name": "bar", "type": "INTEGER", "mode": "NULLABLE" } ]
+				 }
+				]`,
+		})
+}
+
+// Checks if the generator can handle extensions on nested fields
+func TestMessageWithExtensionOnNestedField(t *testing.T) {
+	testConvert(t, `
+			file_to_generate: "foo.proto"			
+			proto_file: <
+				name: "foo.proto"
+				package: "example_package.nested.a.lot"
+				message_type: <
+					name: "Foo"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_MESSAGE type_name: ".example_package.nested.a.lot.Foo.Nested1" json_name: "b" >
+					nested_type <
+						name: "Nested1"
+						field < name: "i1" number: 1 type: TYPE_INT32 label: LABEL_OPTIONAL json_name: "i1">
+						extension_range: < start: 100 end: 200 >
+					>
+					options < [gen_bq_schema.bigquery_opts] <table_name: "foo_table"> >
+				>
+				extension: <
+					name: "bar"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package.nested.a.lot.Foo.Nested1"
+					json_name: "bar"
+				>
+			>
+		`,
+		map[string]string{
+			"example_package/nested/a/lot/foo_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "RECORD", "mode": "REQUIRED", 
+                   "fields": [
+						{ "name": "i1", "type": "INTEGER", "mode": "NULLABLE" },
+				   		{ "name": "ext", "type": "RECORD", "mode": "NULLABLE",
+							"fields": [{ "name": "bar", "type": "INTEGER", "mode": "NULLABLE"}]
+				   		}
+				  	]
+				 }
+				]`,
+		})
+}
+
 // TestIgnoreNonTargetMessage checks if the generator ignores messages without gen_bq_schema.table_name option.
 func TestIgnoreNonTargetMessage(t *testing.T) {
 	testConvert(t, `

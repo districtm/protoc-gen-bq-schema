@@ -294,6 +294,35 @@ func convertMessageType(curPkg *ProtoPackage, msg *descriptor.DescriptorProto, o
 			schema = append(schema, field)
 		}
 	}
+
+	extField := &Field{
+		Name:   "ext",
+		Type:   "RECORD",
+		Mode:   "NULLABLE",
+		Fields: []*Field{},
+	}
+	for _, ext := range msg.GetExtension() {
+		convertedExt, err := convertField(curPkg, ext, opts)
+		if err != nil {
+			glog.Errorf("Failed to convert field %s in %s: %v", ext.GetName(), msg.GetName(), err)
+			return nil, err
+		}
+
+		// Do we have a nested ext ?
+		for _, field := range convertedExt.Fields {
+			extField.Fields = append(extField.Fields, field)
+		}
+
+		// In case we didn't find nested extensions, add the actual ext
+		if len(extField.Fields) == 0 {
+			extField.Fields = append(extField.Fields, convertedExt)
+		}
+	}
+
+	if len(extField.Fields) > 0 {
+		schema = append(schema, extField)
+	}
+
 	return
 }
 
@@ -392,9 +421,17 @@ func convert(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, e
 		generateTargets[file] = true
 	}
 
+	extensions := []*descriptor.FieldDescriptorProto{}
+	for _, file := range req.GetProtoFile() {
+		for _, ext := range file.GetExtension() {
+			extensions = append(extensions, ext)
+		}
+	}
+
 	res := &plugin.CodeGeneratorResponse{}
 	for _, file := range req.GetProtoFile() {
 		for _, msg := range file.GetMessageType() {
+			addExtensions(msg, extensions, file.GetPackage())
 			glog.V(1).Infof("Loading a message type %s from package %s", msg.GetName(), file.GetPackage())
 			registerType(file.Package, msg)
 		}
@@ -411,6 +448,60 @@ func convert(req *plugin.CodeGeneratorRequest) (*plugin.CodeGeneratorResponse, e
 		}
 	}
 	return res, nil
+}
+
+func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.FieldDescriptorProto, pkg string) {
+	for _, ext := range extensions {
+		extendeeNodes := strings.Split(ext.GetExtendee(), ".")
+		pkgNodes := strings.Split(pkg, ".")
+
+		// We already know this extendee cannot be in this package.
+		if len(pkgNodes) > len(extendeeNodes) {
+			continue
+		}
+
+		if len(extendeeNodes) < 2 {
+			continue
+		}
+
+		nodeIdx := 0
+		mismatch := false
+		// skipping leading "."
+		if extendeeNodes[nodeIdx] == "" {
+			extendeeNodes = extendeeNodes[1:]
+		}
+
+		for _, node := range pkgNodes {
+			if node != extendeeNodes[nodeIdx] {
+				mismatch = true
+				break
+			}
+			nodeIdx++
+		}
+
+		// Not the right package or message
+		if mismatch || msg.GetName() != extendeeNodes[nodeIdx] {
+			continue
+		}
+
+		var foundNode *descriptor.DescriptorProto
+		nestedMsgs := msg.GetNestedType()
+		for i := nodeIdx; i < len(extendeeNodes); i += 1 {
+			foundNode = nil
+			for _, nestedMsg := range nestedMsgs {
+				if nestedMsg.GetName() == extendeeNodes[i] {
+					foundNode = nestedMsg
+					break
+				}
+			}
+		}
+
+		if foundNode != nil {
+			foundNode.Extension = append(foundNode.Extension, ext)
+		} else {
+			msg.Extension = append(msg.Extension, ext)
+		}
+	}
 }
 
 func convertFrom(rd io.Reader) (*plugin.CodeGeneratorResponse, error) {
@@ -443,7 +534,7 @@ func commandLineParameters(parameter string) {
 		}
 	}
 
-	 for k, v := range param {
+	for k, v := range param {
 		switch k {
 		case "enumsasints":
 			if v == "true" {
