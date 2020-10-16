@@ -460,7 +460,7 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 			continue
 		}
 
-		if len(extendeeNodes) < 1 {
+		if len(extendeeNodes) < 2 {
 			continue
 		}
 
