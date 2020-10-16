@@ -475,7 +475,7 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 			continue
 		}
 
-		foundNode := (*descriptor.DescriptorProto)(nil)
+		var foundNode *descriptor.DescriptorProto
 		nestedMsgs := msg.GetNestedType()
 		for i := nodeIdx; i < len(extendeeNodes); i += 1 {
 			foundNode = nil
