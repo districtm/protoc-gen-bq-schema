@@ -467,7 +467,7 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 				nodeIdx = 0
 				break
 			}
-			nodeIdx += 1
+			nodeIdx++
 		}
 
 		// Not the right package or message
