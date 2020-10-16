@@ -460,18 +460,27 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 			continue
 		}
 
+		if len(extendeeNodes) < 1 {
+			continue
+		}
+
+		nodeIdx := 0
+		mismatch := false
 		// skipping leading "."
-		nodeIdx := 1
+		if extendeeNodes[nodeIdx] == "" {
+			extendeeNodes = extendeeNodes[1:]
+		}
+
 		for _, node := range pkgNodes {
 			if node != extendeeNodes[nodeIdx] {
-				nodeIdx = 0
+				mismatch = true
 				break
 			}
 			nodeIdx++
 		}
 
 		// Not the right package or message
-		if nodeIdx == 0 || msg.GetName() != extendeeNodes[nodeIdx] {
+		if mismatch || msg.GetName() != extendeeNodes[nodeIdx] {
 			continue
 		}
 
