@@ -273,6 +273,22 @@ func TestMessagesWithExtensionExceptions(t *testing.T) {
 					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
 				>
 			>
+			proto_file: <
+				name: "qux.proto"
+				package: "example_package"
+				message_type: <
+					name: "qux"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+				>
+				extension: <
+					name: "baz"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package"
+					json_name: "baz"
+				>
+			>
 		`,
 		map[string]string{
 			"example_package/nested/a/lot/foo_table.schema": `[
