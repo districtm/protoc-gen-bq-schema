@@ -227,6 +227,84 @@ func TestMessageWithExtensionOnNestedField(t *testing.T) {
 		})
 }
 
+// Try a complex message with extension with a few edge cases
+func TestMessagesWithExtensionExceptions(t *testing.T) {
+	t.Parallel()
+	testConvert(t, `
+			file_to_generate: "foo.proto"			
+			proto_file: <
+				name: "foo.proto"
+				package: "example_package.nested.a.lot"
+				message_type: <
+					name: "Foo"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_STRING json_name: "b" >
+					extension_range: < start: 100 end: 200 >
+					options < [gen_bq_schema.bigquery_opts] <table_name: "foo_table"> >
+				>
+				message_type: <
+					name: "bar"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_STRING json_name: "b" >
+					extension_range: < start: 100 end: 200 >
+					options < [gen_bq_schema.bigquery_opts] <table_name: "bar_table"> >
+				>
+				extension: <
+					name: "bar"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package.nested.a.lot.Foo"
+					json_name: "bar"
+				>
+			>
+			proto_file: <
+				name: "baz.proto"
+				package: "example_package.nested.lot"
+				message_type: <
+					name: "baz"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+				>
+			>
+			proto_file: <
+				name: "qux.proto"
+				package: "example_package.nested.very.very.much.a.lot"
+				message_type: <
+					name: "qux"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+				>
+			>
+			proto_file: <
+				name: "qux.proto"
+				package: "example_package"
+				message_type: <
+					name: "qux"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+				>
+				extension: <
+					name: "baz"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package"
+					json_name: "baz"
+				>
+			>
+		`,
+		map[string]string{
+			"example_package/nested/a/lot/foo_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "ext", "type": "RECORD", "mode": "NULLABLE",
+				  	"fields": [{ "name": "bar", "type": "INTEGER", "mode": "NULLABLE" } ]
+				 }
+				]`,
+			"example_package/nested/a/lot/bar_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "STRING", "mode": "REQUIRED" }]`,
+		})
+}
+
 // TestIgnoreNonTargetMessage checks if the generator ignores messages without gen_bq_schema.table_name option.
 func TestIgnoreNonTargetMessage(t *testing.T) {
 	testConvert(t, `

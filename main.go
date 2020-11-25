@@ -455,11 +455,6 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 		extendeeNodes := strings.Split(ext.GetExtendee(), ".")
 		pkgNodes := strings.Split(pkg, ".")
 
-		// We already know this extendee cannot be in this package.
-		if len(pkgNodes) > len(extendeeNodes) {
-			continue
-		}
-
 		if len(extendeeNodes) < 2 {
 			continue
 		}
@@ -469,6 +464,11 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 		// skipping leading "."
 		if extendeeNodes[nodeIdx] == "" {
 			extendeeNodes = extendeeNodes[1:]
+		}
+
+		// We already know this extendee cannot be in this package.
+		if len(pkgNodes) >= len(extendeeNodes) {
+			continue
 		}
 
 		for _, node := range pkgNodes {
@@ -484,21 +484,21 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 			continue
 		}
 
-		var foundNode *descriptor.DescriptorProto
-		nestedMsgs := msg.GetNestedType()
-		for i := nodeIdx; i < len(extendeeNodes); i += 1 {
-			foundNode = nil
+		// Keep going deeper, perhaps its a nested msg
+		foundFlag := true
+		for i := nodeIdx + 1; i < len(extendeeNodes); i++ {
+			nestedMsgs := msg.GetNestedType()
+			foundFlag = false
 			for _, nestedMsg := range nestedMsgs {
 				if nestedMsg.GetName() == extendeeNodes[i] {
-					foundNode = nestedMsg
+					msg = nestedMsg
+					foundFlag = true
 					break
 				}
 			}
 		}
 
-		if foundNode != nil {
-			foundNode.Extension = append(foundNode.Extension, ext)
-		} else {
+		if foundFlag {
 			msg.Extension = append(msg.Extension, ext)
 		}
 	}
