@@ -486,12 +486,13 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 
 		// Keep going deeper, perhaps its a nested msg
 		foundFlag := true
+		msgCopy := msg
 		for i := nodeIdx + 1; i < len(extendeeNodes); i++ {
-			nestedMsgs := msg.GetNestedType()
+			nestedMsgs := msgCopy.GetNestedType()
 			foundFlag = false
 			for _, nestedMsg := range nestedMsgs {
 				if nestedMsg.GetName() == extendeeNodes[i] {
-					msg = nestedMsg
+					msgCopy = nestedMsg
 					foundFlag = true
 					break
 				}
@@ -499,7 +500,7 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 		}
 
 		if foundFlag {
-			msg.Extension = append(msg.Extension, ext)
+			msgCopy.Extension = append(msgCopy.Extension, ext)
 		}
 	}
 }
