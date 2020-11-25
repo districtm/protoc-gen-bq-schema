@@ -229,6 +229,7 @@ func TestMessageWithExtensionOnNestedField(t *testing.T) {
 
 // Try a complex message with extension with a few edge cases
 func TestMessagesWithExtensionExceptions(t *testing.T) {
+	t.Parallel()
 	testConvert(t, `
 			file_to_generate: "foo.proto"			
 			proto_file: <
