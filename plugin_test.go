@@ -227,6 +227,46 @@ func TestMessageWithExtensionOnNestedField(t *testing.T) {
 		})
 }
 
+func TestMessageWithWrongExtensionComplexPackageName(t *testing.T) {
+	testConvert(t, `
+			file_to_generate: "foo.proto"			
+			proto_file: <
+				name: "foo.proto"
+				package: "example_package.nested.a.lot"
+				message_type: <
+					name: "Foo"
+					field: < name: "a" number: 1 label: LABEL_REQUIRED type: TYPE_STRING json_name: "a" >
+					field: < name: "b" number: 2 label: LABEL_REQUIRED type: TYPE_STRING json_name: "b" >
+                    nested_type <
+						name: "Nested1"
+						nested_type <
+							name: "Nested2"
+							nested_type <
+								name: "Nested3"
+								extension_range: < start: 100 end: 200 >
+							>
+						>
+					>
+					options < [gen_bq_schema.bigquery_opts] <table_name: "foo_table"> >
+				>
+				extension: <
+					name: "bar"
+					number: 126
+					label: LABEL_OPTIONAL
+					type: TYPE_INT32
+					extendee: ".example_package.nested.a.lot.Foo.Nested1.Wrong.Nested3"
+					json_name: "bar"
+				>
+			>
+		`,
+		map[string]string{
+			"example_package/nested/a/lot/foo_table.schema": `[
+				 { "name": "a", "type": "STRING", "mode": "REQUIRED" },
+				 { "name": "b", "type": "STRING", "mode": "REQUIRED" }
+				]`,
+		})
+}
+
 // Try a complex message with extension with a few edge cases
 func TestMessagesWithExtensionExceptions(t *testing.T) {
 	t.Parallel()
