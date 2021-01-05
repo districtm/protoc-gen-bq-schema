@@ -485,6 +485,7 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 		}
 
 		// Keep going deeper, perhaps its a nested msg
+		// We need to find a match on every level for the extension to be added.
 		foundFlag := true
 		msgCopy := msg
 		for i := nodeIdx + 1; i < len(extendeeNodes); i++ {
@@ -496,6 +497,10 @@ func addExtensions(msg *descriptor.DescriptorProto, extensions []*descriptor.Fie
 					foundFlag = true
 					break
 				}
+			}
+			// No match for this round.  We should not continue.
+			if !foundFlag {
+				break
 			}
 		}
 
